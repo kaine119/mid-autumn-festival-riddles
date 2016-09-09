@@ -1,31 +1,42 @@
 app.controller("QuizController", ["$scope", "$http", function($scope, $http){
-	$scope.currentRiddle = {};
+	$scope.currentRiddles = [];
+	$scope.currentRiddle = $scope.currentRiddles.slice(-1)[0];
+	$scope.doneRiddles = [];
 	$scope.highlightCorrect = false;
 	$scope.highlightWrong = false;
 	var score = 0;
-	var attempts = 0;
+	$scope.attempts = 0;
 
 	$scope.checkCorrect = function(answerCorrect){
-		attempts++;
-		if (attempts == 5) {
-			postUserDone(score);
-			alert("Congrats! You've finished with a score of " + score + "/5");
-		}
-		else if (answerCorrect) {
-			console.log('answer was correct')
-			score++;
-			$scope.highlightCorrect = true;
-			setTimeout(function() {
-				$scope.highlightCorrect = false;
-				getRiddle();
-			}, 100);
-		} else {
-			console.log('answer was wrong')
-			$scope.highlightWrong = true;
-			setTimeout(function() {
-				$scope.highlightWrong = false;
-				getRiddle();
-			}, 100);
+		$scope.attempts++;
+		var previousRiddle = $scope.currentRiddle;
+		var currentAttempt = $scope.attempts;
+		if ($scope.attempts > 5) {
+			return;
+		} 
+		else { 
+			previousRiddle.questionNumber = currentAttempt;
+			previousRiddle.guess = answerCorrect;
+			$scope.doneRiddles = prepend(previousRiddle, $scope.doneRiddles);
+			if ($scope.attempts == 5) {
+				postUserDone(score);
+			}
+			else if (answerCorrect) {
+				console.log('answer was correct')
+				score++;
+				$scope.highlightCorrect = true;
+				setTimeout(function() {
+					$scope.highlightCorrect = false;
+					getRiddle();
+				}, 100);
+			} else {
+				console.log('answer was wrong')
+				$scope.highlightWrong = true;
+				setTimeout(function() {
+					$scope.highlightWrong = false;
+					getRiddle();
+				}, 100);
+			}
 		}
 	}
 
@@ -36,9 +47,12 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		})
 		.then(function successCallback(res){
 			console.log(res);
-			$scope.currentRiddle.question = res.data.question;
+			var riddleToPush = {};
+			riddleToPush.question = res.data.question;
 			shuffle(res.data.options);
-			$scope.currentRiddle.options = res.data.options;
+			riddleToPush.options = res.data.options;
+			$scope.currentRiddles.push(riddleToPush);
+			$scope.currentRiddle = $scope.currentRiddles.slice(-1)[0];
 		}, function errorCallback(err){
 			console.log(err)
 		})		
@@ -53,11 +67,16 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		.then(function successCallback(res){
 			console.log(res);
 			$scope.userID = res.data;
+			
+				alert("Congrats! You've finished with a score of " + score + "/5");
 			return true;
 		});
 	}	
 
-	getRiddle();
+	for (var i = 5 - 1; i >= 0; i--) {
+		getRiddle();
+	}
+	
 	
 }])
 
@@ -78,4 +97,10 @@ function shuffle(array) {
   }
 
   return array;
+}
+
+function prepend(value, array) {
+  var newArray = array.slice(0);
+  newArray.unshift(value);
+  return newArray;
 }

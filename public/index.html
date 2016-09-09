@@ -2,18 +2,43 @@
 <html>
 <head>
 	<title>猜灯谜</title>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script type="text/javascript" src="bower_components/angular/angular.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-animate/angular-animate.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-aria/angular-aria.min.js"></script>
+	<script type="text/javascript" src="bower_components/angular-messages/angular-messages.min.js"></script>
+
+	<script type="text/javascript" src="bower_components/angular-material/angular-material.min.js"></script>
+	<link rel="stylesheet" href="bower_components/angular-material/angular-material.min.css">
 	<script type="text/javascript" src="app.js"></script>
 	<script type="text/javascript" src="QuizController.js"></script>
 	<link rel="stylesheet" href="styles.css">
 </head>
-<body ng-app="main" ng-controller="QuizController">
-	<p ng-class="{highlightCorrect: highlightCorrect, highlightWrong: highlightWrong}">{{currentRiddle.question}}<p>
-	<div>
-		<button ng-click="checkCorrect(currentRiddle.options[0].correct)">{{currentRiddle.options[0].text}}</button>
-		<button ng-click="checkCorrect(currentRiddle.options[1].correct)">{{currentRiddle.options[1].text}}</button>
-	</div>
-	<button>Click this button to send a done user!</button>
-	<p>{{userID}}</p>
+<p>{{pastRiddles}}</p>
+<body ng-app="main" ng-controller="QuizController" layout="column" layout-gt-sm="row" layout-align="center center">
+
+	<section layout="column" flex="40">
+		<md-card>
+			<md-toolbar layout="row" style="z-index: 1">
+				<h1>Question {{attempts <= 4 ? attempts + 1 : 5}}</h1>
+			</md-toolbar>
+			<md-content>
+				<h3>{{currentRiddle.question}}</h3>
+				<md-button ng-click="checkCorrect(currentRiddle.options[0].correct)">{{currentRiddle.options[0].text}}</md-button>
+				<md-button ng-click="checkCorrect(currentRiddle.options[1].correct)">{{currentRiddle.options[1].text}}</md-button>
+			</md-content>
+		</md-card>
+	</section>
+	<section layout="row" flex="60" id="past" layout-align="center start">
+		<md-card ng-repeat="riddle in doneRiddles track by $index" flex="100" class="pastCards">
+			<md-toolbar layout="row" style="z-index: 1" class="pastTitles" ng-class="{'md-warn': !riddle.guess}">
+				<h1>Question {{riddle.questionNumber}}</h1>
+			</md-toolbar>
+			<md-content layout="row" layout-align="space-around center">
+				<h3>{{riddle.question}}</h3>
+				<p ng-repeat="option in riddle.options" ng-show="option.correct">{{option.text}}</p>
+			</md-content>
+		</md-card>
+	</section>
 </body>
 </html>
