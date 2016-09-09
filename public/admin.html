@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>猜灯谜</title>
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.8/angular.min.js"></script>
+	<script type="text/javascript" src="../app.js"></script>
+	<script type="text/javascript" src="../AdminController.js"></script>
+	<link rel="stylesheet" href="../styles.css">
+</head>
+<body ng-app="main" ng-controller="AdminController" class="admin_container">
+	<h1>Admin page -- for ICC's eyes only</h1>
+	<p>Please refresh this if someone comes up</p>
+	<div ng-repeat="player in players" ng-hide="player.cleared" class="admin_user">
+		<p>{{player.user_id}}</p> 
+		<p>{{player.score}}</p>
+		<div class="button" ng-click="clearPlayer(player)">Clear</div>
+	</div>
+</body>
+</html>
