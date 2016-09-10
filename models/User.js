@@ -8,7 +8,12 @@ var userSchema = mongoose.Schema({
 			return (Math.random()).toString(36).substr(2, 6);
 		}
 	},
-	cleared: {type: Boolean, default: false}
+	google: {
+		id: String,
+		token: String,
+		email: String,
+		name: String
+	}
 }, {collection: "users"});
 
 var User = mongoose.model("User", userSchema)

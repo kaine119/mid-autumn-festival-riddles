@@ -7,6 +7,14 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 	var score = 0;
 	$scope.attempts = 0;
 
+	$http({
+		method: "GET",
+		url: "/get/userDetails"
+	})
+	.then(function successCallback(res) {
+		$scope.email = res.data.google.email;
+	})
+
 	$scope.checkCorrect = function(answerCorrect){
 		$scope.attempts++;
 		var previousRiddle = $scope.currentRiddle;
@@ -18,6 +26,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 			previousRiddle.questionNumber = currentAttempt;
 			previousRiddle.guess = answerCorrect;
 			$scope.doneRiddles = prepend(previousRiddle, $scope.doneRiddles);
+			console.log($scope.doneRiddles)
 			if ($scope.attempts == 5) {
 				postUserDone(score);
 			}
@@ -41,16 +50,22 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 	}
 
 	var getRiddle = function(){
+		var riddlesIds = []
+		for (var i = $scope.currentRiddles.length - 1; i >= 0; i--) {
+			riddlesIds.push( $scope.currentRiddles[i]._id );
+		}
 		$http({
 			method: "POST",
-			url: "./post/riddle"
+			url: "./post/riddle",
+			data: {pastRiddles: riddlesIds}
 		})
 		.then(function successCallback(res){
 			console.log(res);
 			var riddleToPush = {};
 			riddleToPush.question = res.data.question;
-			shuffle(res.data.options);
+			// shuffle(res.data.options);
 			riddleToPush.options = res.data.options;
+			riddleToPush._id = res.data._id;
 			$scope.currentRiddles.push(riddleToPush);
 			$scope.currentRiddle = $scope.currentRiddles.slice(-1)[0];
 		}, function errorCallback(err){
@@ -73,9 +88,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		});
 	}	
 
-	for (var i = 5 - 1; i >= 0; i--) {
-		getRiddle();
-	}
+	getRiddle();
 	
 	
 }])

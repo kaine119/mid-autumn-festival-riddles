@@ -3,49 +3,54 @@ var Riddle = require('./models/Riddle');
 var User = require('./models/User');
 var mongoose = require("mongoose")
 
-var router = express.Router();
-
-router.post('/post/riddle', function(req, res){
-	Riddle.random([], function(err, riddle){
-		res.send(riddle);
-		console.log(riddle);
-	});
-});
-
-router.get("/admin/:id", function(req, res){
-	if (req.params.id == "DHSICC2016") {
-		res.sendFile(__dirname + "/public/admin.html")
-	} else {
-		res.send(403)
-	}
-});
-
-router.get("/admin(.html)", function(req, res){
-	res.send(403);
-});
-
-router.post("/post/userDone", function(req, res){
-	(new User({score: req.body.score})).save(function(err, newUser){
-		if (err) return console.err(err);
-		res.send(newUser.user_id)
-	})
-});
-
-router.get("/get/users", function(req, res){
-	User.find({}, function(err, users){
-		res.send(users)
-	})
-});
-
-router.post("/post/clearUser", function(req, res){
-	User.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.body.id)}, {$set: {cleared: true}}, function(err, doc){
-		if (err) {
-			return console.err(err);
+module.exports = function(app, passport) {
+	app.post('/post/riddle', function(req, res){
+		var riddlesToExclude = []
+		for (var i = req.body.pastRiddles.length - 1; i >= 0; i--) {
+			console.log(mongoose.Types.ObjectId(req.body.pastRiddles[i]))
+			riddlesToExclude.push( mongoose.Types.ObjectId(req.body.pastRiddles[i]) );
 		}
-		res.send(200)
+		Riddle.find({_id: {$nin: riddlesToExclude}}, function(err, docs){
+			if (err) return console.log(err);
+			var randomIndex = Math.floor(Math.random() * docs.length);
+			res.send(docs[randomIndex])
+		});
+	});
+
+	app.get("/", isLoggedIn, function(req, res){
+		res.sendFile(__dirname + "/pages/index.html")
+	});
+
+	app.get("/auth/google", passport.authenticate('google', 
+		{scope: ['profile', 'email'], 
+		 accessType: "offline",
+		 approvalPrompt: "auto"}));
+
+	app.get('/auth/google/callback', 
+		passport.authenticate("google", {
+			successRedirect: '/',
+			failureRedirect: '/'
+		}));
+
+	app.get("/get/userDetails", isLoggedIn, function(req, res){
+		res.send(req.user);
+	});
+
+	app.post("/post/userDone", isLoggedIn, function(req, res){
+		User.findOneAndUpdate({"google.id": req.user.google.id}, {$set: {score: req.body.score}}, function(err, user){
+			if (err) return console.err(err);
+			res.send(200)
+		})
 	})
-});
+};
 
-router.post("/post/")
+function isLoggedIn(req, res, next){
+	if (req.isAuthenticated()) {
+		return next();
+	}
+	res.redirect("/auth/google")
+}
 
-module.exports = router;
+
+
+

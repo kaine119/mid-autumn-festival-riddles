@@ -14,10 +14,10 @@
 	<script type="text/javascript" src="QuizController.js"></script>
 	<link rel="stylesheet" href="styles.css">
 </head>
-<p>{{pastRiddles}}</p>
 <body ng-app="main" ng-controller="QuizController" layout="column" layout-gt-sm="row" layout-align="center center">
-
+	
 	<section layout="column" flex="40">
+		<md-content flex="">Logged in as {{email}}</md-content>
 		<md-card>
 			<md-toolbar layout="row" style="z-index: 1">
 				<h1>Question {{attempts <= 4 ? attempts + 1 : 5}}</h1>
