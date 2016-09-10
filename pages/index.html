@@ -24,8 +24,10 @@
 			</md-toolbar>
 			<md-content>
 				<h3>{{currentRiddle.question}}</h3>
-				<md-button ng-click="checkCorrect(currentRiddle.options[0].correct)">{{currentRiddle.options[0].text}}</md-button>
-				<md-button ng-click="checkCorrect(currentRiddle.options[1].correct)">{{currentRiddle.options[1].text}}</md-button>
+				<md-button ng-hide="attempts == 5" ng-click="checkCorrect(currentRiddle.options[0].correct)">{{currentRiddle.options[0].text}}</md-button>
+				<md-button ng-hide="attempts == 5" ng-click="checkCorrect(currentRiddle.options[1].correct)">{{currentRiddle.options[1].text}}</md-button>
+				<md-button ng-show="attempts == 5" onclick="location.reload()">Play Again</md-button>
+
 			</md-content>
 		</md-card>
 	</section>
