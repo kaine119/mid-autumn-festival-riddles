@@ -13,6 +13,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 	})
 	.then(function successCallback(res) {
 		$scope.email = res.data.google.email;
+		$scope.score = res.data.score;
 	})
 
 	$scope.checkCorrect = function(answerCorrect){
@@ -34,22 +35,19 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 				console.log('answer was correct')
 				score++;
 				$scope.highlightCorrect = true;
-				setTimeout(function() {
-					$scope.highlightCorrect = false;
-					getRiddle();
-				}, 100);
+				getRiddle();
 			} else {
 				console.log('answer was wrong')
 				$scope.highlightWrong = true;
-				setTimeout(function() {
-					$scope.highlightWrong = false;
-					getRiddle();
-				}, 100);
+				getRiddle();
 			}
 		}
 	}
 
 	var getRiddle = function(){
+		$scope.highlightCorrect = false;
+		$scope.highlightWrong = false;
+
 		var riddlesIds = []
 		for (var i = $scope.currentRiddles.length - 1; i >= 0; i--) {
 			riddlesIds.push( $scope.currentRiddles[i]._id );
@@ -81,11 +79,18 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		})
 		.then(function successCallback(res){
 			console.log(res);
-			$scope.userID = res.data;
-			
-				alert("Congrats! You've finished with a score of " + score + "/5");
+			alert("Congrats! You've finished with a score of " + score + "/5");
+			$http({
+				method: "GET",
+				url: "/get/userDetails"
+			})
+			.then(function successCallback(res) {
+				$scope.score = res.data.score;
+			})
 			return true;
+
 		});
+		
 	}	
 
 	getRiddle();
