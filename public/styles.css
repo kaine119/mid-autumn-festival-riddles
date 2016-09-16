@@ -3,7 +3,7 @@
 }
 
 .highlightWrong {
-	background: #ff0000
+	background: #F44336
 }
 
 md-content {
@@ -49,3 +49,8 @@ md-toolbar {
 	background: #F44336
 }
 
+#historyContainer {
+	background: #ccc;
+	padding: 5px;
+	margin-bottom: 1em;
+}

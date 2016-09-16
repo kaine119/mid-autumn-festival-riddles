@@ -21,6 +21,14 @@ module.exports = function(app, passport) {
 		res.sendFile(__dirname + "/pages/index.html")
 	});
 
+	app.get("/history", isLoggedIn, function(req, res){
+		res.sendFile(__dirname + "/pages/history.html")
+	});
+
+	app.get("/leaderboard", isLoggedIn, function(req, res){
+		res.sendFile(__dirname + '/pages/leaderboard.html')
+	});
+
 	app.get("/auth/google", passport.authenticate('google', 
 		{scope: ['profile', 'email'], 
 		 accessType: "offline",
@@ -33,14 +41,46 @@ module.exports = function(app, passport) {
 		}));
 
 	app.get("/get/userDetails", isLoggedIn, function(req, res){
-		res.send(req.user);
+		User.findOne({"google.id": req.user.google.id}, "attempts", function(err, person){
+			if (err) return console.log(err);
+			console.log("high score: " + person.getHighScore());
+			res.send({email: req.user.google.email, score: person.getHighScore()})
+		})
+	});
+
+	app.get("/get/userHistory", isLoggedIn, function(req, res){
+		User.findOne({"google.id": req.user.google.id}, "attempts", function(err, person){
+			if (err) return console.log(err);
+			res.send(person.attempts)
+		})
+	});
+
+	app.get("/get/leaderboardEntries", isLoggedIn, function(req, res){
+		User.find({}, "attempts google", function(err, docs){
+			for (var i = docs.length - 1; i >= 0; i--) {
+				if (docs[i].google.id == req.user.google.id) {
+					docs[i].google.name = "Me"
+				}
+				console.log(docs[i].getHighScore())
+				docs[i].score = docs[i].getHighScore();
+			}
+			res.send(docs);
+		})
 	});
 
 	app.post("/post/userDone", isLoggedIn, function(req, res){
-		User.findOneAndUpdate({"google.id": req.user.google.id}, {$set: {score: req.body.score}}, function(err, user){
-			if (err) return console.err(err);
-			res.send(200)
-		})
+		console.log(req.body.questionsAttempted);
+		User.findOneAndUpdate({"google.id": req.user.google.id}, 
+			{
+				$set: {"score": req.body.score}, 
+				$push: {"attempts": {
+					score: req.body.score, attempted: req.body.questionsAttempted
+				}}
+			}, 
+			function(err, user){
+				if (err) return console.err(err);
+				res.send(200)
+			});
 	})
 };
 

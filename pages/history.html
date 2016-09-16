@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<script type="text/javascript" src="../bower_components/angular/angular.min.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-animate/angular-animate.min.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-aria/angular-aria.min.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-messages/angular-messages.min.js"></script>
+	<script type="text/javascript" src="../bower_components/angular-material/angular-material.min.js"></script>
+	<link rel="stylesheet" href="../bower_components/angular-material/angular-material.min.css">
+	<script type="text/javascript" src="../app.js"></script>
+	<script type="text/javascript" src="../HistoryController.js"></script>
+	<link rel="stylesheet" href="../styles.css">
+
+	<title>猜灯谜 &mdash; History</title>
+</head>
+<body ng-app="main" layout="column" flex>
+	<md-toolbar flex="10">
+		<h2>History</h2>
+	</md-toolbar>
+	<md-content flex="90" ng-controller="HistoryController">
+		<div ng-repeat="attempt in attempts | orderBy: '-_id'" id="historyContainer">
+			<p style="margin-left: 0.5em;">Score: {{attempt.score}}</p>
+			<md-card ng-repeat="question in attempt.attempted" ng-class="{'highlightCorrect': question.guess, 'highlightWrong': !question.guess}"
+					 style="padding-left: 5px;">
+				{{question.question}}: <span ng-repeat="option in question.options" ng-show="option.correct">{{option.text}}</span>
+			</md-card>
+		</div>
+	</md-content>
+</body>
+</html>

@@ -12,7 +12,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		url: "/get/userDetails"
 	})
 	.then(function successCallback(res) {
-		$scope.email = res.data.google.email;
+		$scope.email = res.data.email;
 		$scope.score = res.data.score;
 	})
 
@@ -28,10 +28,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 			previousRiddle.guess = answerCorrect;
 			$scope.doneRiddles = prepend(previousRiddle, $scope.doneRiddles);
 			console.log($scope.doneRiddles)
-			if ($scope.attempts == 5) {
-				postUserDone(score);
-			}
-			else if (answerCorrect) {
+			if (answerCorrect) {
 				console.log('answer was correct')
 				score++;
 				$scope.highlightCorrect = true;
@@ -40,6 +37,9 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 				console.log('answer was wrong')
 				$scope.highlightWrong = true;
 				getRiddle();
+			}
+			if ($scope.attempts == 5) {
+				postUserDone(score);
 			}
 		}
 	}
@@ -75,7 +75,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		$http({
 			method: "POST",
 			url: "/post/userDone",
-			data: {score: score}
+			data: {score: score, questionsAttempted: $scope.currentRiddles}
 		})
 		.then(function successCallback(res){
 			console.log(res);
