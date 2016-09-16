@@ -20,7 +20,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		$scope.attempts++;
 		var previousRiddle = $scope.currentRiddle;
 		var currentAttempt = $scope.attempts;
-		if ($scope.attempts > 5) {
+		if ($scope.attempts > 10) {
 			return;
 		} 
 		else { 
@@ -38,7 +38,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 				$scope.highlightWrong = true;
 				getRiddle();
 			}
-			if ($scope.attempts == 5) {
+			if ($scope.attempts == 10) {
 				postUserDone(score);
 			}
 		}
@@ -79,7 +79,7 @@ app.controller("QuizController", ["$scope", "$http", function($scope, $http){
 		})
 		.then(function successCallback(res){
 			console.log(res);
-			alert("Congrats! You've finished with a score of " + score + "/5");
+			alert("Congrats! You've finished with a score of " + score + "/10");
 			$http({
 				method: "GET",
 				url: "/get/userDetails"

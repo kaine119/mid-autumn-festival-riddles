@@ -16,7 +16,7 @@
 </head>
 <body ng-app="main" ng-controller="QuizController" layout="column" layout-gt-sm="row" layout-align="center center">
 	
-	<section layout="column" flex="60" flex-gt-sm="100">
+	<section layout="column" flex="60" flex-gt-sm="60">
 		<md-content flex="30" flex-gt-sm="10">
 			Logged in as {{email}}<span ng-show="score != null">, score: {{score}}</span> <br>
 			<a href="history"><md-button>History</md-button></a> 
@@ -28,14 +28,14 @@
 			</md-toolbar>
 			<md-content>
 				<h3>{{currentRiddle.question}}</h3>
-				<md-button ng-hide="attempts == 5" ng-click="checkCorrect(currentRiddle.options[0].correct)">{{currentRiddle.options[0].text}}</md-button>
-				<md-button ng-hide="attempts == 5" ng-click="checkCorrect(currentRiddle.options[1].correct)">{{currentRiddle.options[1].text}}</md-button>
-				<md-button ng-show="attempts == 5" onclick="location.reload()">Play Again</md-button>
+				<md-button ng-hide="attempts == 10" ng-click="checkCorrect(currentRiddle.options[0].correct)">{{currentRiddle.options[0].text}}</md-button>
+				<md-button ng-hide="attempts == 10" ng-click="checkCorrect(currentRiddle.options[1].correct)">{{currentRiddle.options[1].text}}</md-button>
+				<md-button ng-show="attempts == 10" onclick="location.reload()">Play Again</md-button>
 
 			</md-content>
 		</md-card>
 	</section>
-	<section layout="row" flex="40" id="past" layout-align="center start">
+	<section layout="row" flex="40" flex-gt-sm="40" id="past" layout-align="center start">
 		<md-card ng-repeat="riddle in doneRiddles track by $index" flex="100" class="pastCards">
 			<md-toolbar layout="row" style="z-index: 1" class="pastTitles" ng-class="{'md-warn': !riddle.guess}">
 				<h1>Question {{riddle.questionNumber}}</h1>
